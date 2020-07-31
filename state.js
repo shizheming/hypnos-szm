@@ -10,7 +10,7 @@
     我现在是这样认为得，状态得变化是内部的，这无可厚非，但是状态得改变有2种条件，一种是自主变化，就像我状态不好我会自己调节，不需要条件，另一种情况就是需要外部条件，然后变化状态，这个倒和策略有点像，上面那个例子就是自身的变化
 
 */
-
+import {attachment} from './attachment'
 // 1.外部条件引发的内部状态改变
 export const warpState = function (stateCollection) {
     // 初始状态，状态对象第一个
@@ -30,13 +30,15 @@ export const warpState = function (stateCollection) {
     return state;
 };
 
-export const baseState = function () {
-    function s (obj) {
-        return state(obj)
-    }
-    s.attachment = baseState.base;
-    return attachment(s)
-}
+export const baseState = function (stateCollection) {
+    const newState = warpState(stateCollection);
+    
+    return function s (...args) {
+      let result = newState.apply(this, args);
+  
+      return s.base(result);
+    };
+  };
 
 // 2.第一次运行完后就出发的内部状态改变
 export const onceState = function (stateCollection) {
