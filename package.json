@@ -1,11 +1,12 @@
 {
   "name": "hypnos-szm",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "sofia",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "shizheming",
-  "license": "ISC"
+  "license": "ISC",
+  "homepage": "https://github.com/shizheming/hypnos-szm"
 }
