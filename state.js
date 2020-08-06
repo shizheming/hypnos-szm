@@ -48,9 +48,9 @@ export const onceState = function (stateCollection) {
     let currentSate = stateCollection[keys[0]];
 
     return function (...args) {
-        currentSate.apply(this, args);
+        let result = currentSate.apply(this, args);
         currentSate = stateCollection[keys[1]];
-        return currentSate;
+        return result;
     };
 };
 
