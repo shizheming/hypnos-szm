@@ -17,7 +17,7 @@ export const accAdd = function (arg1, arg2) {
         r2 = 0;
     }
     m = Math.pow(10, Math.max(r1, r2));
-    return (_.accMul(arg1, m) + _.accMul(arg2, m)) / m;
+    return (accMul(arg1, m) + accMul(arg2, m)) / m;
 };
 
 // 减法

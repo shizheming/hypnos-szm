@@ -10,7 +10,17 @@
     我现在是这样认为得，状态得变化是内部的，这无可厚非，但是状态得改变有2种条件，一种是自主变化，就像我状态不好我会自己调节，不需要条件，另一种情况就是需要外部条件，然后变化状态，这个倒和策略有点像，上面那个例子就是自身的变化
 
 */
-import {attachment} from './attachment'
+/* 
+用法
+let fn = warpState({
+    a(){},
+    b(){},
+    ...
+});
+fn();
+fn.change('b');
+fn();
+ */
 // 1.外部条件引发的内部状态改变
 export const warpState = function (stateCollection) {
     // 初始状态，状态对象第一个
@@ -38,8 +48,18 @@ export const baseState = function (stateCollection) {
   
       return s.base(result);
     };
-  };
+};
 
+/* 
+用法
+let fn = onceState({
+    a(){},
+    b(){},
+    ...
+});
+fn();
+fn();
+ */
 // 2.第一次运行完后就出发的内部状态改变
 export const onceState = function (stateCollection) {
     // 初始状态，状态对象第一个
@@ -54,6 +74,16 @@ export const onceState = function (stateCollection) {
     };
 };
 
+/* 
+用法
+let fn = strategy({
+    a(){},
+    b(){},
+    ...
+});
+fn('a');
+fn('b');
+ */
 // 3.内部运行change，当策略来用
 // 这是最简单的策略，
 // 这里有个问题，就是我的目的就是逻辑更加的清晰，那么我写个if-else清晰还是策略清晰，我是说就很简短的一个判断，并不是有很多策略能选，多的情况坑定是选策略，我先搞清楚，策略并不是侏罗纪，策略不能代替侏罗纪，

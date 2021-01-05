@@ -8,20 +8,23 @@ import moment from 'moment';
 // 处理时间戳和分，回显的时候，当后端接口返回后在promise外面包了一层来处理之间事情
 // 都是被逼的，要是后端都愿意转，我何必再要干这件事情呢
 // 处理时间戳和分，回显的时候和提交的时候
+/*
+用法
+let obj = {
+    ...
+    format: {
+        time: ['a','b'],
+        money: ['e','k']
+    }
+}
+
+*/
 export const warpAPI = function (api) {
     forEach(api, function (value, key, c) {
         api[key] = function (data = {}) {
             // 这里是吐给后端的数据
             // 预处理
             if (data.format) {
-                /*
-                    {
-                        format: {
-                            time: ['a','b'],
-                            money: ['e','k']
-                        }
-                    }
-                 */
                 const {time = [], money = []} = data.format;
 
                 delete data.format;
