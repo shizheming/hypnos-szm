@@ -70,7 +70,7 @@ let s = relationship([
 ]);
 console.log(s);
 */
-function relationship (table, obj) {
+export const relationship = function (table, obj) {
     // 我又思考了下，既然逻辑思维我不擅长，那么我就把他变得扁平再去操作，而且是反向操作，因为倒叙得线只有一条，正序得路线会有好几条，会分叉，试试
     const result = table.map((current, idx) => {
         // 1打点扁平
@@ -194,4 +194,3 @@ function flatRelationship (current) {
     }
     return result;
 }
-export default relationship;
