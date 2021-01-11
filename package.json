@@ -1,6 +1,6 @@
 {
   "name": "hypnos-szm",
-  "version": "1.1.21",
+  "version": "1.1.23",
   "description": "sofia",
   "main": "index.js",
   "scripts": {
@@ -8,5 +8,9 @@
   },
   "author": "shizheming",
   "license": "ISC",
-  "homepage": "https://github.com/shizheming/hypnos-szm"
+  "homepage": "https://github.com/shizheming/hypnos-szm",
+  "dependencies": {
+    "lodash": "^4.17.20",
+    "moment": "^2.29.1"
+  }
 }
