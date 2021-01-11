@@ -143,7 +143,6 @@ export const relationship = function (table, obj) {
             return item.name;
         });
     }).flat())];
-
     const firstName = compose(compact, uniq, flattenDeep)(flattenDeep(result).map(({nameObj: {father}}) => father));
     const lastName = difference(allFirstName, firstName);
 
@@ -156,7 +155,8 @@ export const relationship = function (table, obj) {
     });
 
     console.log(lastResult, 5);
-    return lastResult;
+    // 在重新反转回来
+    return lastResult.map(current => current.map(item => item.reverse()));
 }
 function flatRelationship (current) {
     const {name, relationship, nameObj = {}} = current;
