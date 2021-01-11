@@ -18,7 +18,7 @@
 
 */
 import {isArray, isString, isPlainObject, last, flattenDeep, uniq, compact, difference} from 'lodash';
-import compose from './compose';
+import {compose} from './compose';
 /* 
 用法
 function a () {
