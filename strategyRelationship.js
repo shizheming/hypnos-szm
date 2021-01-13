@@ -43,7 +43,7 @@ function f () {
     alert('f');
 }
 
-let s = relationship([
+let s = strategyRelationship([
     {
         name: 'a',
         relationship: {
@@ -74,7 +74,7 @@ let s = relationship([
 console.log(s);
 */
 
-export const relationship = function(table) {
+export const strategyRelationship = function(table) {
   // 我又思考了下，既然逻辑思维我不擅长，那么我就把他变得扁平再去操作，而且是反向操作，因为倒叙得线只有一条，正序得路线会有好几条，会分叉，试试
   let result = table.map((current, idx) => {
     // 1打平数组
