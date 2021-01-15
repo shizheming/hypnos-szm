@@ -6,3 +6,4 @@ export { attachment } from "./attachment";
 export { memory } from "./memory";
 export { strategyRelationship } from "./strategyRelationship";
 export { compose } from "./compose";
+export { linkage } from "./linkage";
