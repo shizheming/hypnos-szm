@@ -1,9 +1,8 @@
-export { warpState, onceState, strategy, baseState } from "./state";
-export { recursive } from "./operation";
-export { accAdd, accSubtr, accMul } from "./calculation";
-export { warpAPI, warpModalSubmit } from "./business";
 export { attachment } from "./attachment";
-export { memory } from "./memory";
-export { strategyRelationship } from "./strategyRelationship";
+export { warpAPI, warpModalSubmit } from "./business";
+export { accAdd, accSubtr, accMul } from "./calculation";
 export { compose } from "./compose";
-export { linkage } from "./linkage";
+export { linkage, linkageRelationship } from "./linkage";
+export { recursive } from "./operation";
+export { warpState, onceState, strategy, baseState } from "./state";
+export { strategyRelationship } from "./strategyRelationship";

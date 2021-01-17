@@ -23,31 +23,31 @@ fn();
  */
 // 1.外部条件引发的内部状态改变
 export const warpState = function (stateCollection) {
-    // 初始状态，状态对象第一个
-    var keys = Object.keys(stateCollection);
-    var currentSate = stateCollection[keys[0]];
+  // 初始状态，状态对象第一个
+  var keys = Object.keys(stateCollection);
+  var currentSate = stateCollection[keys[0]];
 
-    function state () {
-        return currentSate.apply(this, arguments);
-    }
-    state.change = function (key) {
-        currentSate = stateCollection[key];
-        state.state = key;
-    };
-    state.getState = function (key) {
-        return state.state
-    };
-    return state;
+  function state() {
+    return currentSate.apply(this, arguments);
+  }
+  state.change = function (key) {
+    currentSate = stateCollection[key];
+    state.state = key;
+  };
+  state.getState = function (key) {
+    return state.state;
+  };
+  return state;
 };
 
 export const baseState = function (stateCollection) {
-    const newState = warpState(stateCollection);
-    
-    return function s (...args) {
-      let result = newState.apply(this, args);
-  
-      return s.base(result);
-    };
+  const newState = warpState(stateCollection);
+
+  return function s(...args) {
+    let result = newState.apply(this, args);
+
+    return s.base(result);
+  };
 };
 
 /* 
@@ -62,16 +62,16 @@ fn();
  */
 // 2.第一次运行完后就出发的内部状态改变
 export const onceState = function (stateCollection) {
-    // 初始状态，状态对象第一个
-    const keys = Object.keys(stateCollection);
+  // 初始状态，状态对象第一个
+  const keys = Object.keys(stateCollection);
 
-    let currentSate = stateCollection[keys[0]];
+  let currentSate = stateCollection[keys[0]];
 
-    return function (...args) {
-        let result = currentSate.apply(this, args);
-        currentSate = stateCollection[keys[1]];
-        return result;
-    };
+  return function (...args) {
+    let result = currentSate.apply(this, args);
+    currentSate = stateCollection[keys[1]];
+    return result;
+  };
 };
 
 /* 
@@ -88,10 +88,12 @@ fn('b');
 // 这是最简单的策略，
 // 这里有个问题，就是我的目的就是逻辑更加的清晰，那么我写个if-else清晰还是策略清晰，我是说就很简短的一个判断，并不是有很多策略能选，多的情况坑定是选策略，我先搞清楚，策略并不是侏罗纪，策略不能代替侏罗纪，
 export const strategy = function (strategy) {
-    const state = warpState(strategy);
+  const state = warpState(strategy);
 
-    return function (str, ...args) {
-        state.change(str);
-        return state.apply(this, args);
-    };
+  return function (str, ...args) {
+    state.change(str);
+    return state.apply(this, args);
+  };
 };
+
+// 写个新的onceStste

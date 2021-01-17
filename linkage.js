@@ -7,21 +7,47 @@
     占时不考虑间断性
     参数是一个接着一个传递下去的，联动嘛
 */
-import { onceState } from "hypnos-szm";
-import { isPlainObject, isArray, isString, zipObject } from "lodash";
-export const linkage = function(first, ...fn) {
-  fn.push(() => {});
-  const arrFn = onceState({
-    a(c) {
-      return c;
-    },
-    b(c) {
-      return [c];
-    },
-  });
 
-  return function(...args) {
-    return fn.reduce(
+/* 
+用法
+export const data = [
+  {
+    name: 'setOrderQuantity',
+    relationship: [
+      {
+        name: 'ladderPrice',
+        relationship: {
+          name: 'setUnitPurchasePrice',
+          relationship: [
+            {
+              name: 'set_adjust_mount'
+            },
+            {
+              name: 'set_shop_selling_price'
+            }
+          ]
+        }
+      },
+      {
+        name: 'setPurchaseAmount'
+      },
+      {
+        name: 'needCalculatedPrice'
+      }
+    ]
+  }
+];
+*/
+
+import { isPlainObject, isArray, isString, zipObject } from "lodash";
+export const linkage = function (first, ...fn) {
+  fn.push(() => {});
+  const arrFn = function (v) {
+    return isArray(v) ? v : [v];
+  };
+
+  return function (...args) {
+    const result = fn.reduce(
       (a, b) => {
         const r = arrFn(a.back);
 
@@ -37,25 +63,31 @@ export const linkage = function(first, ...fn) {
         f: first,
       }
     );
+
+    return result;
   };
 };
 
-export const linkageRelationship = function(relationshipTable, obj) {
+export const linkageRelationship = function (relationshipTable, obj) {
   //我现在就是要把传进来的方法包一下重新丢出去用
   let allFn = [];
   let fn = relationshipTable.map((current) => {
     return flatRelationship(current);
   });
   let titleKey = [];
+
   fn.forEach((current) => {
     titleKey.push(current[0]);
     let arrStr = [];
+
     current.forEach((item) => {
       let s = item.split(".");
+
       if (s.length == 1) {
         arrStr.push(obj[item]);
       } else {
         let fn = findObjFn(obj[s[0]], item);
+
         arrStr.push(fn);
       }
     });
@@ -67,6 +99,7 @@ export const linkageRelationship = function(relationshipTable, obj) {
 function findObjFn(o, str) {
   let father;
   let s = str.split(".");
+
   s.shift();
   s.forEach((current) => {
     father = o;
