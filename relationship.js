@@ -1,138 +1,140 @@
-/* 
+/*
   逻辑可视化-概览
   以最基本的关系表为基础，把一些逻辑概念整合进去
   现在有
     联动
     判条件断
+
+    表单控件的状态
+    1-显示
+      1-1-可编辑
+      1-2-不可编辑
+    2-隐藏
+
+    添加全局数据
 */
-/* 
-  用法
-  // 以联动为基础，扩展判断
-let hhhhhh = [
-  {
-    be: 'linkage',
-    name: 'a',
-    relationship: [
-      {
-        be: 'judge',
-        name: 'b',
-        relationship: [
-          {
-            name: 'c'
-          },
-          {
-            name: 'd'
-          }
-        ]
-      },
-      {
-        be: 'linkage',
-        name: 'e',
-        relationship: {
-          be: 'judge',
-          name: 'ff',
-          relationship: [
-            {
-              name: 'g'
-            },
-            {
-              name: 'h'
-            }
-          ]
-        }
-      },
-      {
-        be: 'linkage',
-        name: 'i',
-        relationship: 'j'
-      }
-    ]
-  }
-];
-*/
-import {isPlainObject, isArray, isString} from 'lodash';
+// 控件的状态几乎都是外部条件所决定的变化，很少有自己状态的变化，所以我先考虑前者
 
-export const simpleLinkage = function (relationshipTable, obj, args) {
-  let {relationship} = relationshipTable;
+import { isPlainObject, isArray, isString ,forEach} from "lodash";
 
-  // console.log(relationshipTable.name, 'simpleLinkage');
-  let result = arrFn(obj[relationshipTable.name](args));
 
+// 联动
+const simpleLinkage = function(relationshipTable, obj, args) {
+  let lastResult;
+  const { relationship } = relationshipTable;
+  const originalResult = obj[relationshipTable.name](...args)
+  const result = arrFn(originalResult);
+  relation.data[relationshipTable.name] = originalResult;
   if (isString(relationship)) {
     // 说明已经到底了
-    obj[relationship]();
+    lastResult = obj[relationship](...result);
+    relation.data[relationship] = lastResult;
   } else if (isPlainObject(relationship)) {
     // 是对象说明是唯一得一条路往下联系
-
-    return {
-      be: 'going',
-      relationship
-    };
+    addBe(relationship, relationshipTable);
+    lastResult = r(relationship, obj, result);
   } else if (isArray(relationship)) {
+    let arrResult = result;
     // 是数组说明是分岔路
-    return {
-      be: 'going',
-      relationship
-    };
+    relationship.forEach((item) => {
+      addBe(item, relationshipTable);
+      arrResult = r(item, obj, arrResult);
+    });
+    lastResult = arrResult;
   }
+  return arrFn(lastResult);
 };
 
-export const simpleStrategy = function (relationshipTable, obj, arg) {
-  // console.log(relationshipTable.name, 'judge');
-  const {relationship} = relationshipTable;
-
-  arg = arrFn(obj[relationshipTable.name](arg));
+// 判断
+const simpleStrategy = function(relationshipTable, obj, args) {
+  let lastResult;
+  const { relationship } = relationshipTable;
+  const originalResult = obj[relationshipTable.name](...args)
+  let result = arrFn(originalResult);
+  relation.data[relationshipTable.name] = originalResult;
   if (isPlainObject(relationship)) {
     // 是对象说明是唯一得一条路往下联系
-    return {
-      be: 'going',
-      relationship
-    };
+    addBe(relationship, relationshipTable);
+    lastResult = r(relationship, obj, result);
   } else if (isArray(relationship)) {
-    let firstName = arg.shift();
-
+    let arrResult = result;
+    const firstName = [...result].shift();
     // 是数组说明是分岔路
-    let [findObj] = relationship.filter(({name}) => name === firstName);
-
-    // console.log(findObj, 'ccc');
-    return {
-      be: 'going',
-      relationship: findObj
-    };
+    const findObj = relationship.filter(({ name }) => name === firstName);
+    findObj.forEach((item) => {
+      addBe(item, relationshipTable);
+      arrResult = r(item, obj, arrResult);
+    });
+    lastResult = arrResult;
   }
+  return arrFn(lastResult);
 };
 
-export const bing = function (table, obj) {
-  table.forEach(current => {
-    r(current, obj);
-  });
+// 状态
+const simpleState = function(relationshipTable, obj, args) {
+  let lastResult;
+  const { relationship } = relationshipTable;
+  // 状态判断函数
+  const originalResult = obj[relationshipTable.name](...args)
+  let result = arrFn(originalResult);
+  relation.data[relationshipTable.name] = originalResult;
+
+  const firstName = result.shift();
+  const [state] = relationship.filter(({ state }) => state === firstName);
+  // 渲染组件
+  let dom = obj[relationshipTable.component](
+    displayState(state.state, ...result)
+  );
+  relation.data[relationshipTable.component] = dom;
+  lastResult = r(state.relationship ? state.relationship : {}, obj, [dom]);
+  return arrFn(lastResult);
 };
 
-function r (current, obj) {
-  let result;
 
-  if (current.be === 'linkage') {
-    result = simpleLinkage(current, obj);
-  } else if (current.be === 'judge') {
-    result = simpleStrategy(current, obj);
+function r(current, obj, args) {
+  let result = args;
+  
+  
+  if (current.be === "linkage") {
+    result = simpleLinkage(current, obj, result);
+  } else if (current.be === "judge") {
+    result = simpleStrategy(current, obj, result);
+  } else if (current.be === "state") {
+    result = simpleState(current, obj, result);
   }
-
-  if (result && result.be === 'going') {
-    if (isArray(result.relationship)) {
-      result.relationship.forEach(item => {
-        r(item, obj);
-      });
-    } else if (isPlainObject(result.relationship)) {
-      if (!result.relationship.be) {
-        obj[result.relationship.name]();
-      }
-      r(result.relationship, obj);
-    }
-  } else {
-    return result;
-  }
+  return result;
 }
 
-const arrFn = function (v) {
+// 没有写be就给他加上父级的be,同时要判断下面有没有realtionship，如果没有就不要加了
+const addBe = function(current, parent) {
+  if (!current.be) current.be = parent.be;
+};
+const arrFn = function(v) {
   return isArray(v) ? v : [v];
 };
+
+// 显示哪种状态
+const displayState = function(state) {
+  return {
+    show: "show",
+    hide: "hide",
+    able: "able",
+    disabled: "disabled",
+  }[state];
+};
+
+
+// 合体
+export const relation = function(table, obj, ...args) {
+  forEach(obj,(value, key) => {
+    relation.data[key] = undefined;
+  })
+  let result = args;
+  table.forEach((current) => {
+    result = r(current, obj, result);
+    console.log(result,293)
+  });
+  console.log(result,301)
+  return result
+};
+relation.data = {}
